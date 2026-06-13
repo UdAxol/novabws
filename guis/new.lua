@@ -248,25 +248,25 @@ local themeBtn = new("TextButton", {
     BorderSizePixel=0, Font=FONT_MED, TextSize=11,
     Text="● " .. currentThemeName,
 })
-themeBind(themeBtn, "BackgroundColor3", "BG_TERTIARY")
-themeBind(themeBtn, "TextColor3", "TEXT_DIM")
+themeBind(themeBtn, "BackgroundColor3", "ACCENT_DIM")
+themeBind(themeBtn, "TextColor3", "TEXT_PRIMARY")
 corner(themeBtn, 6)
-local themeBtnStroke = strokeOf(themeBtn, nil, 1, 0.5)
-themeBind(themeBtnStroke, "Color", "BORDER_SOFT")
+local themeBtnStroke = strokeOf(themeBtn, nil, 1, 0)
+themeBind(themeBtnStroke, "Color", "ACCENT")
 
 local LAYOUT_ORDER = {"Sidebar", "Topbar", "Compact"}
 local currentLayoutName = profile and profile._layout or "Sidebar"
 local layoutBtn = new("TextButton", {
-    Parent=titleBar, Size=UDim2.fromOffset(80,24),
-    Position=UDim2.new(1,-348,0.5,-12), AutoButtonColor=false,
+    Parent=titleBar, Size=UDim2.fromOffset(86,24),
+    Position=UDim2.new(1,-354,0.5,-12), AutoButtonColor=false,
     BorderSizePixel=0, Font=FONT_MED, TextSize=11,
     Text="◧ " .. currentLayoutName,
 })
-themeBind(layoutBtn, "BackgroundColor3", "BG_TERTIARY")
-themeBind(layoutBtn, "TextColor3", "TEXT_DIM")
+themeBind(layoutBtn, "BackgroundColor3", "BG_QUARTERY")
+themeBind(layoutBtn, "TextColor3", "TEXT_PRIMARY")
 corner(layoutBtn, 6)
-local layoutBtnStroke = strokeOf(layoutBtn, nil, 1, 0.5)
-themeBind(layoutBtnStroke, "Color", "BORDER_SOFT")
+local layoutBtnStroke = strokeOf(layoutBtn, nil, 1, 0)
+themeBind(layoutBtnStroke, "Color", "ACCENT_DIM")
 
 local userChip = new("TextLabel", {
     Parent=titleBar, Size=UDim2.new(0,160,1,0),
@@ -523,11 +523,11 @@ themeBtn.Activated:Connect(function()
 end)
 
 attachHover(themeBtn,
-    function() tween(themeBtn, 0.12, {BackgroundColor3 = theme.BG_QUARTERY}) end,
-    function() tween(themeBtn, 0.12, {BackgroundColor3 = theme.BG_TERTIARY}) end)
+    function() tween(themeBtn, 0.12, {BackgroundColor3 = theme.ACCENT}) end,
+    function() tween(themeBtn, 0.12, {BackgroundColor3 = theme.ACCENT_DIM}) end)
 attachHover(layoutBtn,
-    function() tween(layoutBtn, 0.12, {BackgroundColor3 = theme.BG_QUARTERY}) end,
-    function() tween(layoutBtn, 0.12, {BackgroundColor3 = theme.BG_TERTIARY}) end)
+    function() tween(layoutBtn, 0.12, {BackgroundColor3 = theme.ACCENT_DIM}) end,
+    function() tween(layoutBtn, 0.12, {BackgroundColor3 = theme.BG_QUARTERY}) end)
 
 local function applyCatStripVertical()
     catStrip.Size = UDim2.new(0, STRIP_W, 1, -48)

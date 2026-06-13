@@ -196,23 +196,34 @@ nova:Load()
 
 task.spawn(function()
     if shared.NovaIndependent then return end
-    -- universal.lua is shared cross-game; load if present.
-    local univOk = pcall(function()
-        local s = downloadFile("nova/games/universal.lua")
-        loadstring(s, "universal")(nova)
-    end)
-    if not univOk then warn("[Nova v2] universal.lua not yet ported — skipping") end
 
-    -- Per-place game file. PlaceId-to-file mapping (extend as we port more games).
-    local gameId = game.PlaceId
-    local gameFile = "nova/games/" .. tostring(gameId) .. ".lua"
-    local placeOk = pcall(function()
-        local s = downloadFile(gameFile)
-        loadstring(s, tostring(gameId))(nova)
-    end)
-    if not placeOk then
-        -- Demo modules in universal.lua already loaded above, so this is fine.
+    local function loadGameFile(path, name)
+        local okDl, src = pcall(downloadFile, path)
+        if not okDl then
+            warn("[Nova v2] download FAILED for " .. path .. ": " .. tostring(src))
+            nova:CreateNotification("[Nova v2 ERROR]", "Download failed: " .. path .. "\n" .. tostring(src):sub(1,120), 10)
+            return false
+        end
+        local fn, err = loadstring(src, name)
+        if not fn then
+            warn("[Nova v2] compile FAILED for " .. path .. ": " .. tostring(err))
+            nova:CreateNotification("[Nova v2 ERROR]", "Compile error in " .. path .. ":\n" .. tostring(err):sub(1,120), 10)
+            return false
+        end
+        local okRun, runErr = pcall(fn, nova)
+        if not okRun then
+            warn("[Nova v2] runtime FAILED for " .. path .. ": " .. tostring(runErr))
+            nova:CreateNotification("[Nova v2 ERROR]", "Runtime error in " .. path .. ":\n" .. tostring(runErr):sub(1,200), 12)
+            return false
+        end
+        return true
     end
+
+    loadGameFile("nova/games/universal.lua", "universal")
+
+    local gameId = game.PlaceId
+    local placePath = "nova/games/" .. tostring(gameId) .. ".lua"
+    pcall(loadGameFile, placePath, tostring(gameId))
 
     if nova.ApplyCurrentLayout then nova:ApplyCurrentLayout() end
     nova:CreateNotification("[Nova v2]", "Loaded for " .. tostring(validatedUsername) .. ". Press RightShift to open.", 5)
