@@ -211,9 +211,10 @@ task.spawn(function()
         loadstring(s, tostring(gameId))(nova)
     end)
     if not placeOk then
-        nova:CreateNotification("[Nova v2]", "No module file for this place yet (" .. tostring(gameId) .. "). UI loaded, no game modules.", 6)
+        -- Demo modules in universal.lua already loaded above, so this is fine.
     end
 
+    if nova.ApplyCurrentLayout then nova:ApplyCurrentLayout() end
     nova:CreateNotification("[Nova v2]", "Loaded for " .. tostring(validatedUsername) .. ". Press RightShift to open.", 5)
 end)
 

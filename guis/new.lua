@@ -254,6 +254,20 @@ corner(themeBtn, 6)
 local themeBtnStroke = strokeOf(themeBtn, nil, 1, 0.5)
 themeBind(themeBtnStroke, "Color", "BORDER_SOFT")
 
+local LAYOUT_ORDER = {"Sidebar", "Topbar", "Compact"}
+local currentLayoutName = profile and profile._layout or "Sidebar"
+local layoutBtn = new("TextButton", {
+    Parent=titleBar, Size=UDim2.fromOffset(80,24),
+    Position=UDim2.new(1,-348,0.5,-12), AutoButtonColor=false,
+    BorderSizePixel=0, Font=FONT_MED, TextSize=11,
+    Text="◧ " .. currentLayoutName,
+})
+themeBind(layoutBtn, "BackgroundColor3", "BG_TERTIARY")
+themeBind(layoutBtn, "TextColor3", "TEXT_DIM")
+corner(layoutBtn, 6)
+local layoutBtnStroke = strokeOf(layoutBtn, nil, 1, 0.5)
+themeBind(layoutBtnStroke, "Color", "BORDER_SOFT")
+
 local userChip = new("TextLabel", {
     Parent=titleBar, Size=UDim2.new(0,160,1,0),
     Position=UDim2.new(1,-176,0,0), BackgroundTransparency=1,
@@ -511,6 +525,129 @@ end)
 attachHover(themeBtn,
     function() tween(themeBtn, 0.12, {BackgroundColor3 = theme.BG_QUARTERY}) end,
     function() tween(themeBtn, 0.12, {BackgroundColor3 = theme.BG_TERTIARY}) end)
+attachHover(layoutBtn,
+    function() tween(layoutBtn, 0.12, {BackgroundColor3 = theme.BG_QUARTERY}) end,
+    function() tween(layoutBtn, 0.12, {BackgroundColor3 = theme.BG_TERTIARY}) end)
+
+local function applyCatStripVertical()
+    catStrip.Size = UDim2.new(0, STRIP_W, 1, -48)
+    catStrip.Position = UDim2.new(0, 0, 0, 48)
+    catStripBorder.Size = UDim2.new(0, 1, 1, 0)
+    catStripBorder.Position = UDim2.new(1, -1, 0, 0)
+    catList.ScrollingDirection = Enum.ScrollingDirection.Y
+    if catList.UIListLayout then
+        catList.UIListLayout.FillDirection = Enum.FillDirection.Vertical
+        catList.UIListLayout.Padding = UDim.new(0, 4)
+    end
+    pad(catList, 10, 10, 10, 10)
+    for _, c in ipairs(categories) do
+        if c.Row then
+            c.Row.Size = UDim2.new(1, 0, 0, 36)
+            c.IconImg.Position = UDim2.new(0, 14, 0.5, -9)
+            c.IconImg.Size = UDim2.fromOffset(18, 18)
+            c.Text.Size = UDim2.new(1, -42, 1, 0)
+            c.Text.Position = UDim2.new(0, 40, 0, 0)
+            c.Text.TextXAlignment = Enum.TextXAlignment.Left
+            c.Indicator.Position = UDim2.new(0, 0, 0.5, 0)
+            c.Indicator.AnchorPoint = Vector2.new(0, 0.5)
+        end
+    end
+end
+
+local function applyCatStripHorizontal()
+    catStrip.Size = UDim2.new(1, 0, 0, 44)
+    catStrip.Position = UDim2.new(0, 0, 0, 48)
+    catStripBorder.Size = UDim2.new(1, 0, 0, 1)
+    catStripBorder.Position = UDim2.new(0, 0, 1, -1)
+    catList.ScrollingDirection = Enum.ScrollingDirection.X
+    if catList.UIListLayout then
+        catList.UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+        catList.UIListLayout.Padding = UDim.new(0, 6)
+    end
+    pad(catList, 8, 14, 8, 14)
+    for _, c in ipairs(categories) do
+        if c.Row then
+            c.Row.Size = UDim2.fromOffset(96, 28)
+            c.IconImg.Position = UDim2.new(0, 8, 0.5, -7)
+            c.IconImg.Size = UDim2.fromOffset(14, 14)
+            c.Text.Size = UDim2.new(1, -30, 1, 0)
+            c.Text.Position = UDim2.new(0, 26, 0, 0)
+            c.Text.TextXAlignment = Enum.TextXAlignment.Left
+            c.Indicator.Position = UDim2.new(0.5, 0, 1, -2)
+            c.Indicator.AnchorPoint = Vector2.new(0.5, 1)
+        end
+    end
+end
+
+local function applyLayout(name)
+    if not table.find(LAYOUT_ORDER, name) then name = "Sidebar" end
+    currentLayoutName = name
+    profile._layout = name
+    pcall(saveProfile, profile)
+    layoutBtn.Text = "◧ " .. name
+
+    if name == "Sidebar" then
+        local W, H = 600, 440
+        tween(mainFrame, 0.2, {Size = UDim2.fromOffset(W, H)})
+        applyCatStripVertical()
+        modulePage.Size = UDim2.new(1, -STRIP_W, 1, -48)
+        modulePage.Position = UDim2.new(0, STRIP_W, 0, 48)
+        moduleList.Size = UDim2.new(1, 0, 1, -56)
+        moduleList.Position = UDim2.new(0, 0, 0, 56)
+        pageHeader.Visible = true
+        if moduleList.UIListLayout then
+            moduleList.UIListLayout.FillDirection = Enum.FillDirection.Vertical
+            moduleList.UIGridLayout = nil
+        end
+        for _, m in pairs(mainapi.Modules) do
+            if m.Frame then m.Frame.Size = UDim2.new(1, 0, 0, 46) end
+        end
+    elseif name == "Topbar" then
+        local W, H = 620, 460
+        tween(mainFrame, 0.2, {Size = UDim2.fromOffset(W, H)})
+        applyCatStripHorizontal()
+        modulePage.Size = UDim2.new(1, 0, 1, -92)
+        modulePage.Position = UDim2.new(0, 0, 0, 92)
+        moduleList.Size = UDim2.new(1, 0, 1, -56)
+        moduleList.Position = UDim2.new(0, 0, 0, 56)
+        pageHeader.Visible = true
+        if moduleList.UIListLayout then
+            moduleList.UIListLayout.FillDirection = Enum.FillDirection.Vertical
+        end
+        for _, m in pairs(mainapi.Modules) do
+            if m.Frame then m.Frame.Size = UDim2.new(1, 0, 0, 46) end
+        end
+    elseif name == "Compact" then
+        local W, H = 520, 360
+        tween(mainFrame, 0.2, {Size = UDim2.fromOffset(W, H)})
+        applyCatStripVertical()
+        catStrip.Size = UDim2.new(0, 110, 1, -48)
+        modulePage.Size = UDim2.new(1, -110, 1, -48)
+        modulePage.Position = UDim2.new(0, 110, 0, 48)
+        moduleList.Size = UDim2.new(1, 0, 1, -44)
+        moduleList.Position = UDim2.new(0, 0, 0, 44)
+        pageHeader.Size = UDim2.new(1, 0, 0, 44)
+        pageHeader.Visible = true
+        if moduleList.UIListLayout then
+            moduleList.UIListLayout.FillDirection = Enum.FillDirection.Vertical
+            moduleList.UIListLayout.Padding = UDim.new(0, 4)
+        end
+        for _, c in ipairs(categories) do
+            if c.Row then c.Row.Size = UDim2.new(1, 0, 0, 28) end
+        end
+        for _, m in pairs(mainapi.Modules) do
+            if m.Frame then m.Frame.Size = UDim2.new(1, 0, 0, 36) end
+        end
+    end
+end
+
+layoutBtn.Activated:Connect(function()
+    local idx = 1
+    for i, n in ipairs(LAYOUT_ORDER) do if n == currentLayoutName then idx = i; break end end
+    local next_ = LAYOUT_ORDER[(idx % #LAYOUT_ORDER) + 1]
+    applyLayout(next_)
+    createNotification("Layout", "Switched to " .. next_, 2)
+end)
 
 local function makeToggleVisual(moduleApi, optSettings)
     local row = new("Frame", {
@@ -1108,6 +1245,9 @@ function mainapi:CreateNotification(title, content, duration)
     return createNotification(title, content, duration)
 end
 function mainapi:Clean(thingOrFn) table.insert(self.Cleanups, thingOrFn); return thingOrFn end
+function mainapi:ApplyCurrentLayout() applyLayout(currentLayoutName) end
+function mainapi:SetLayout(name) applyLayout(name) end
+function mainapi:SetTheme(name) applyTheme(name) end
 
 function mainapi:Uninject()
     mainapi.Loaded = false
