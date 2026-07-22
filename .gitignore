@@ -1,0 +1,10 @@
+_readable_src/
+_readable_src_v2/
+Nova/
+Nova_v2/
+nova_standalone_backup.lua
+_strip_comments.js
+scratch/
+*.md.bak
+stylua.toml
+.claude/
